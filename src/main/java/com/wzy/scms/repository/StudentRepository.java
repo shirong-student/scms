@@ -17,4 +17,7 @@ public interface StudentRepository extends JpaRepository<Student, Integer> {
     @Query("from Student where name=?1 and password=?2")
     Student getNamePassword(String name, String password);
 
+//    @Query("from Student where code=?1")
+//    Student getCode(String code);
+
 }

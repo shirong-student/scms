@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Optional;
+
 @RestController
 @RequestMapping("/student")
 public class StudentController {
@@ -64,10 +66,25 @@ public class StudentController {
      */
     @PostMapping("/login-name-password")
     public String loginNamePassword(String name, String password) {
-        System.out.println("@@@@@@@" + studentRepository.getNamePassword(name, password));
         if (studentRepository.getNamePassword(name, password) == null) {
             return "Login Failed";
         }
         return "Login successfully";
+    }
+
+    /**
+     * 实现根据id查询学生信息的接口
+     */
+    @PostMapping("/id-list")
+    public Optional<Student> idList(Integer id){
+        return studentRepository.findById(id);
+    }
+
+    /**
+     * 实现根据code查询学生的接口
+     */
+    @PostMapping("/code-list")
+    public Student codeList(String code){
+        return studentRepository.getCode(code);
     }
 }
