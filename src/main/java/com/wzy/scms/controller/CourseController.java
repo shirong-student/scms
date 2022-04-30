@@ -65,7 +65,7 @@ public class CourseController {
      */
     @PostMapping("/select-all-course")
     public Page<Course> selectCourse(Integer page) {
-        Pageable pageable = PageRequest.of(page, 10, Sort.Direction.DESC, "id");
+        Pageable pageable = PageRequest.of(page, 10, Sort.Direction.ASC, "id");
         return courseRepository.findAll(pageable);
     }
 
@@ -74,7 +74,11 @@ public class CourseController {
      */
     @PostMapping("/select-course")
     public Page<Course> selectCourse(Integer page, String searchVal) {
-        Pageable pageable = PageRequest.of(page, 2, Sort.Direction.DESC, "code");
+        Pageable pageable = PageRequest.of(page, 2, Sort.Direction.ASC, "code");
         return courseRepository.selectCourse(searchVal, pageable);
     }
+
+    /**
+     *
+     */
 }

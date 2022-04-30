@@ -1,6 +1,7 @@
 package com.wzy.scms.repository;
 
 import com.wzy.scms.entity.Course;
+import com.wzy.scms.entity.StudentCourse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -21,5 +22,4 @@ public interface CourseRepository extends JpaRepository<Course, Integer> {
 
     @Query(value = "SELECT c FROM Course c WHERE c.name LIKE %?1%")
     Page<Course> selectCourse(String searchVal, Pageable pageable);
-
 }
