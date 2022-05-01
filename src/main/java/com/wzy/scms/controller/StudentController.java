@@ -3,24 +3,29 @@ package com.wzy.scms.controller;
 import com.wzy.scms.entity.Student;
 import com.wzy.scms.repository.StudentCourseRepository;
 import com.wzy.scms.repository.StudentRepository;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.data.domain.Sort;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Optional;
 
 @RestController
 @RequestMapping("/student")
 public class StudentController {
-    final
-    StudentRepository studentRepository;
-    final
-    StudentCourseRepository studentCourseRepository;
+    final StudentRepository studentRepository;
+    final StudentCourseRepository studentCourseRepository;
 
     public StudentController(StudentRepository studentRepository, StudentCourseRepository studentCourseRepository) {
         this.studentRepository = studentRepository;
         this.studentCourseRepository = studentCourseRepository;
+    }
+
+    /**
+     * list
+     */
+    @GetMapping("/list")
+    public List<Student> list() {
+        return studentRepository.findAll(Sort.by(Sort.Direction.ASC, "code"));
     }
 
     /**
@@ -58,6 +63,7 @@ public class StudentController {
     public String update(Integer id, @RequestBody Student student) {
         student.setId(id);
         studentRepository.save(student);
+        System.out.println("@@@@ " + id + " *** " + student);
         return "Update Successfully";
     }
 
@@ -75,16 +81,16 @@ public class StudentController {
     /**
      * 实现根据id查询学生信息的接口
      */
-    @PostMapping("/id-list")
-    public Optional<Student> idList(Integer id){
+    @GetMapping("/id-list")
+    public Optional<Student> idList(Integer id) {
         return studentRepository.findById(id);
     }
 
     /**
      * 实现根据code查询学生的接口
      */
-    @PostMapping("/code-list")
-    public Student codeList(String code){
+    @GetMapping("/code-list")
+    public List<Student> codeList(String code) {
         return studentRepository.getCode(code);
     }
 }

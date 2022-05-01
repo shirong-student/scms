@@ -16,4 +16,5 @@ public class Course {
     String code; // 课程编号
     String name; // 课程名称
     Float credit; // 学分，例如：3.5学分
+    Integer teacherId; // 教师id
 }

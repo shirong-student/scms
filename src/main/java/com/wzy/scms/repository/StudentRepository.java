@@ -5,11 +5,13 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface StudentRepository extends JpaRepository<Student, Integer> {
 
     @Query("from Student where code=?1")
-    Student getCode(String code);
+    List<Student> getCode(String code);
 
     @Query("from Student where name=?1")
     Student getName(String name);
