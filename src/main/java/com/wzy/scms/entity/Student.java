@@ -6,7 +6,7 @@ import lombok.Data;
 import javax.persistence.*;
 import javax.validation.constraints.*;
 import java.io.Serializable;
-import java.sql.Date;
+import java.util.Date;
 
 @Data
 @Entity

@@ -3,6 +3,8 @@ package com.wzy.scms.controller;
 import com.wzy.scms.entity.Student;
 import com.wzy.scms.repository.StudentCourseRepository;
 import com.wzy.scms.repository.StudentRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,8 +26,8 @@ public class StudentController {
      * list
      */
     @GetMapping("/list")
-    public List<Student> list() {
-        return studentRepository.findAll(Sort.by(Sort.Direction.ASC, "code"));
+    public Page<Student> list(Integer page) {
+        return studentRepository.findAll(PageRequest.of(page,6,Sort.by(Sort.Direction.ASC, "code")));
     }
 
     /**
@@ -60,17 +62,15 @@ public class StudentController {
      * 修改学生，根据id，修改学生的数据。
      */
     @PostMapping("/update")
-    public String update(Integer id, @RequestBody Student student) {
-        student.setId(id);
+    public String update(@RequestBody Student student) {
         studentRepository.save(student);
-        System.out.println("@@@@ " + id + " *** " + student);
         return "Update Successfully";
     }
 
     /**
      * 实现根据姓名和密码的登录接口
      */
-    @PostMapping("/login-name-password")
+    @GetMapping("/login-name-password")
     public String loginNamePassword(String name, String password) {
         if (studentRepository.getNamePassword(name, password) == null) {
             return "Login Failed";
