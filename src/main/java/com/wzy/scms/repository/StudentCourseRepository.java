@@ -19,7 +19,7 @@ public interface StudentCourseRepository extends JpaRepository<StudentCourse, In
     @Query(value = "select sc.* from student_course sc, student s, course c " +
             " where (select student.id from student where student.code = ?1) = sc.student_id and " +
             " (select course.id from course where course.code = ?2) = sc.course_id", nativeQuery = true)
-    List<StudentCourse> selectStudentCourse(String studentCode, String courseCode);
+    StudentCourse selectStudentCourse(String studentCode, String courseCode);
 
     //实现根据学号查询学生所选课程的接口（查询出的数据需要包含学号，姓名，课程编号，课程名，成绩），按成绩升序排序输出。
     @Query("select distinct new com.wzy.scms.vo.SelectedCourseVo(s.code, s.name, c.code, c.name, sc.achievement) " +

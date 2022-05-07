@@ -8,7 +8,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -90,7 +89,7 @@ public class StudentController {
      * 实现根据code查询学生的接口
      */
     @GetMapping("/code-list")
-    public List<Student> codeList(String code) {
+    public Student codeList(String code) {
         return studentRepository.getCode(code);
     }
 }

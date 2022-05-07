@@ -8,11 +8,13 @@ import com.wzy.scms.vo.AvgVo;
 import com.wzy.scms.vo.ElectiveCourseVo;
 import com.wzy.scms.vo.MinMaxAvgAchievementVo;
 import com.wzy.scms.vo.SelectedCourseVo;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -35,8 +37,12 @@ public class StudentCourseController {
      * 学生选课：根据学号和课程号，实现添加选课的接口，如果学生已经选过此课程，则不能添加。（学生进行选课使用）
      */
     @PostMapping("/add")
-    public String add(String studentCode, String courseCode, @RequestBody StudentCourse studentCourse) {
-        if (studentCourseRepository.selectStudentCourse(studentCode, courseCode).size() == 0) {
+    public String add(String studentCode, String courseCode, @RequestBody StudentCourse studentCourse) throws ParseException {
+        if (studentCourseRepository.selectStudentCourse(studentCode, courseCode) == null) {
+            studentCourse.setStudentId(studentRepository.getIDbyCode(studentCode));
+            studentCourse.setCourseId(courseRepository.getIDbyCode(courseCode));
+            studentCourse.setSelectDate(new SimpleDateFormat("yyyy-MM-dd").
+                    parse(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))));
             studentCourseRepository.save(studentCourse);
             return "Add Successfully";
         }
@@ -46,10 +52,11 @@ public class StudentCourseController {
     /**
      * 学生退选：根据学号和课程号，实现退选的接口。（学生进行退选使用）
      */
-    @PostMapping("/delete")
-    public String delete(String studentCode, String courseCode, @RequestBody StudentCourse studentCourse) {
-        if (studentCourseRepository.selectStudentCourse(studentCode, courseCode).size() != 0) {
-            studentCourseRepository.deleteById(studentCourse.getId());
+    @GetMapping("/delete")
+    public String delete(String studentCode, String courseCode) {
+        StudentCourse studentCourses = studentCourseRepository.selectStudentCourse(studentCode, courseCode);
+        if (studentCourses != null) {
+            studentCourseRepository.deleteById(studentCourses.getId());
             return "delete Successfully";
         }
         return "delete Failed";
@@ -72,7 +79,12 @@ public class StudentCourseController {
      */
     @PostMapping("/update")
     public String update(String studentCode, String courseCode, @RequestBody StudentCourse studentCourse) {
-        if (studentCourseRepository.selectStudentCourse(studentCode, courseCode).size() != 0) {
+        StudentCourse studentCourse1 = studentCourseRepository.selectStudentCourse(studentCode, courseCode);
+        if (studentCourse1 != null) {
+            studentCourse.setId(studentCourse1.getId());
+            studentCourse.setStudentId(studentRepository.getIDbyCode(studentCode));
+            studentCourse.setCourseId(courseRepository.getIDbyCode(courseCode));
+            studentCourse.setSelectDate(studentCourse1.getSelectDate());
             studentCourseRepository.save(studentCourse);
             return "update Successfully";
         }
@@ -82,7 +94,7 @@ public class StudentCourseController {
     /**
      * 实现根据学号查询学生所选课程的接口（查询出的数据需要包含学号，姓名，课程编号，课程名，成绩），按成绩升序排序输出。
      */
-    @PostMapping("/select-id")
+    @GetMapping("/select-id")
     public List<SelectedCourseVo> selectId(String code) {
         return studentCourseRepository.selectStudentCourseByCode(code);
     }
@@ -90,7 +102,7 @@ public class StudentCourseController {
     /**
      * 实现根据学号，统计查询该生所选课程的平均分的接口
      */
-    @PostMapping("/select-avg-achievement")
+    @GetMapping("/select-avg-achievement")
     public List<AvgVo> selectAvgAchievement(String code) {
         return studentCourseRepository.selectAvgAchievement(code);
     }
@@ -100,7 +112,7 @@ public class StudentCourseController {
      * 姓名，性别，系部，选课时间，成绩），分页查询并按学生编号升序排序输出。
      */
     @PostMapping("/select-course-student")
-    public List<ElectiveCourseVo> selectCourseStudent(String name){
+    public List<ElectiveCourseVo> selectCourseStudent(String name) {
 //        Pageable pageable = PageRequest.of(page, 10, Sort.Direction.ASC);
         return studentCourseRepository.selectCourseStudent(name);
     }

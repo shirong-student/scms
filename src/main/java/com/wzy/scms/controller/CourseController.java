@@ -8,8 +8,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Objects;
-
 @RestController
 @RequestMapping("/course")
 public class CourseController {
@@ -38,10 +36,8 @@ public class CourseController {
      */
     @GetMapping("/delete")
     public String delete(Integer id) {
-        for (int i = 0; i < courseRepository.getCourseId().size(); i++) {
-            if (Objects.equals(courseRepository.getCourseId().get(i), id)) {
-                return "Delete Failed";
-            }
+        if (courseRepository.getCourseId().size() > 0) {
+            return "Delete Failed";
         }
         courseRepository.deleteById(id);
         return "Delete Successfully";

@@ -11,7 +11,7 @@ import java.util.List;
 public interface StudentRepository extends JpaRepository<Student, Integer> {
 
     @Query("from Student where code=?1")
-    List<Student> getCode(String code);
+    Student getCode(String code);
 
     @Query("from Student where name=?1")
     Student getName(String name);
@@ -19,7 +19,7 @@ public interface StudentRepository extends JpaRepository<Student, Integer> {
     @Query("from Student where name=?1 and password=?2")
     Student getNamePassword(String name, String password);
 
-//    @Query("from Student where code=?1")
-//    Student getCode(String code);
+    @Query(value = "select id from Student where code = ?1",nativeQuery = true)
+    Integer getIDbyCode(String code);
 
 }
