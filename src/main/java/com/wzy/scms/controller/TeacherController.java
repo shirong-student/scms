@@ -4,9 +4,9 @@ import com.wzy.scms.entity.StudentCourse;
 import com.wzy.scms.entity.Teacher;
 import com.wzy.scms.repository.TeacherRepository;
 import com.wzy.scms.vo.MinMaxAvgAchievementVo;
+import com.wzy.scms.vo.TeacherCourseVo;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -36,6 +36,8 @@ public class TeacherController {
      */
     @PostMapping("/update")
     public String update(@RequestBody Teacher teacher) {
+        Teacher teacherSource = teacherRepository.selectTeacherByCode(teacher.getCode());
+        teacher.setId(teacherSource.getId());
         teacherRepository.save(teacher);
         return "update Successfully";
     }
@@ -48,27 +50,28 @@ public class TeacherController {
         teacherRepository.deleteById(id);
         return "delete Successfully";
     }
+
     /**
      * 教师查看
      */
     @GetMapping("/list")
     public Page<Teacher> list(Integer page) {
-        return teacherRepository.findAll(PageRequest.of(page,6));
+        return teacherRepository.findAll(PageRequest.of(page, 6));
     }
 
     /**
      * 教师能查询自己单门课程的选课信息
      */
-    @GetMapping("/select-student-course")
-    public List<StudentCourse> selectStudentCourse(Integer id) {
-        return teacherRepository.selectStudentCourse(id);
+    @PostMapping("/select-student-course")
+    public List<TeacherCourseVo> selectStudentCourse(@RequestBody Teacher teacher) {
+        return teacherRepository.selectStudentCourse(teacher.getId());
     }
 
     /**
      * 教师能分析自己的所有课程成绩统计信息（每门课的平均分，最高分，最低分等）
      */
-    @GetMapping("/select-min-max-avg")
-    public List<MinMaxAvgAchievementVo> selectMinMaxAvg(Integer id) {
-        return teacherRepository.selectMinMaxAvg(id);
+    @PostMapping("/select-min-max-avg")
+    public List<MinMaxAvgAchievementVo> selectMinMaxAvg(@RequestBody Teacher teacher) {
+        return teacherRepository.selectMinMaxAvg(teacher.getId());
     }
 }

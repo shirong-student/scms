@@ -21,6 +21,6 @@ public interface CourseRepository extends JpaRepository<Course, Integer> {
     @Query(value = "SELECT c FROM Course c WHERE c.name LIKE %?1%")
     Page<Course> selectCourse(String searchVal, Pageable pageable);
 
-    @Query(value = "select id from Course where code=?1",nativeQuery = true)
+    @Query(value = "select id from Course where code=?1", nativeQuery = true)
     Integer getIDbyCode(String code);
 }

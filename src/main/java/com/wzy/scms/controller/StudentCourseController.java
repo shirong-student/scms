@@ -8,13 +8,16 @@ import com.wzy.scms.vo.AvgVo;
 import com.wzy.scms.vo.ElectiveCourseVo;
 import com.wzy.scms.vo.MinMaxAvgAchievementVo;
 import com.wzy.scms.vo.SelectedCourseVo;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -37,8 +40,10 @@ public class StudentCourseController {
      * 学生选课：根据学号和课程号，实现添加选课的接口，如果学生已经选过此课程，则不能添加。（学生进行选课使用）
      */
     @PostMapping("/add")
-    public String add(String studentCode, String courseCode, @RequestBody StudentCourse studentCourse) throws ParseException {
-        if (studentCourseRepository.selectStudentCourse(studentCode, courseCode) == null) {
+    public String add(String studentCode, String courseCode) throws ParseException {
+        if (studentCode != null && courseCode != null &&
+                studentCourseRepository.selectStudentCourse(studentCode, courseCode) == null) {
+            StudentCourse studentCourse = new StudentCourse();
             studentCourse.setStudentId(studentRepository.getIDbyCode(studentCode));
             studentCourse.setCourseId(courseRepository.getIDbyCode(courseCode));
             studentCourse.setSelectDate(new SimpleDateFormat("yyyy-MM-dd").
@@ -65,26 +70,24 @@ public class StudentCourseController {
     /**
      * 学生退学：根据学号，实现删除该学生的选课记录的接口。（删除学生时使用）
      */
-    @PostMapping("/delete-id")
-    public String deleteId(Integer id) {
-        if (studentCourseRepository.findById(id).isPresent()) {
-            studentCourseRepository.deleteById(id);
-            return "delete Successfully";
-        }
-        return "delete Failed";
+    @GetMapping("/delete-code")
+    public int deleteId(String code) {
+        return studentCourseRepository.deleteStudentId(studentRepository.getCode(code).getId());
     }
 
     /**
      * 教师成绩评定：根据学号和课程号，修改学生的成绩。（教师进行成绩评定使用）
      */
-    @PostMapping("/update")
-    public String update(String studentCode, String courseCode, @RequestBody StudentCourse studentCourse) {
-        StudentCourse studentCourse1 = studentCourseRepository.selectStudentCourse(studentCode, courseCode);
-        if (studentCourse1 != null) {
-            studentCourse.setId(studentCourse1.getId());
+    @GetMapping("/update")
+    public String update(String studentCode, String courseCode, Float achievement) {
+        StudentCourse sc = studentCourseRepository.selectStudentCourse(studentCode, courseCode);
+        if (sc != null) {
+            StudentCourse studentCourse = new StudentCourse();
+            studentCourse.setId(sc.getId());
             studentCourse.setStudentId(studentRepository.getIDbyCode(studentCode));
             studentCourse.setCourseId(courseRepository.getIDbyCode(courseCode));
-            studentCourse.setSelectDate(studentCourse1.getSelectDate());
+            studentCourse.setSelectDate(sc.getSelectDate());
+            studentCourse.setAchievement(achievement);
             studentCourseRepository.save(studentCourse);
             return "update Successfully";
         }
@@ -111,16 +114,16 @@ public class StudentCourseController {
      * 实现根据课程名称查询选修该课程的学生的接口，（查询出的数据需要包含课程编号，课程名称，学生学号，
      * 姓名，性别，系部，选课时间，成绩），分页查询并按学生编号升序排序输出。
      */
-    @PostMapping("/select-course-student")
-    public List<ElectiveCourseVo> selectCourseStudent(String name) {
-//        Pageable pageable = PageRequest.of(page, 10, Sort.Direction.ASC);
-        return studentCourseRepository.selectCourseStudent(name);
+    @GetMapping("/select-course-student")
+    public Page<ElectiveCourseVo> selectCourseStudent(Integer page, String name) {
+        Pageable pageable = PageRequest.of(page, 10, Sort.Direction.ASC, "code");
+        return studentCourseRepository.selectCourseStudent(name, pageable);
     }
 
     /**
      * 实现根据课程名称，统计查询课程的最高分、最低分、平均分的接口
      */
-    @PostMapping("/select-min-max-avg")
+    @GetMapping("/select-min-max-avg")
     public List<MinMaxAvgAchievementVo> selectMinMaxAvg(String name) {
         return studentCourseRepository.selectMinMaxAvg(name);
     }

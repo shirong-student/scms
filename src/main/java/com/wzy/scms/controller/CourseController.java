@@ -57,7 +57,7 @@ public class CourseController {
      */
     @GetMapping("/list")
     public Page<Course> selectCourse(Integer page) {
-        Pageable pageable = PageRequest.of(page, 10, Sort.Direction.ASC, "id");
+        Pageable pageable = PageRequest.of(page, 10, Sort.Direction.ASC, "code");
         return courseRepository.findAll(pageable);
     }
 
@@ -69,8 +69,4 @@ public class CourseController {
         Pageable pageable = PageRequest.of(page, 2, Sort.Direction.ASC, "code");
         return courseRepository.selectCourse(searchVal, pageable);
     }
-
-    /**
-     *
-     */
 }

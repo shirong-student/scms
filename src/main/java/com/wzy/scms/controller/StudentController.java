@@ -26,11 +26,11 @@ public class StudentController {
      */
     @GetMapping("/list")
     public Page<Student> list(Integer page) {
-        return studentRepository.findAll(PageRequest.of(page,6,Sort.by(Sort.Direction.ASC, "code")));
+        return studentRepository.findAll(PageRequest.of(page, 6, Sort.by(Sort.Direction.ASC, "code")));
     }
 
     /**
-     * 学生的增加。code不能重复, 用户名不能重复。
+     * 学生注册：增加。code不能重复。
      */
     @PostMapping("/add")
     public String add(@RequestBody Student student) {
@@ -42,7 +42,7 @@ public class StudentController {
     }
 
     /**
-     * 删除学生，实现根据id删除学生，有选课的学生，必须把选课记录删除。
+     * 学生删除：根据id删除学生，有选课的学生，必须把选课记录删除。
      */
     @PostMapping("/delete")
     public String delete(Integer id) {
@@ -58,7 +58,7 @@ public class StudentController {
     }
 
     /**
-     * 修改学生，根据id，修改学生的数据。
+     * 学生修改个人信息：修改，根据id，修改学生的数据。
      */
     @PostMapping("/update")
     public String update(@RequestBody Student student) {
@@ -81,8 +81,8 @@ public class StudentController {
      * 实现根据id查询学生信息的接口
      */
     @GetMapping("/id-list")
-    public Optional<Student> idList(Integer id) {
-        return studentRepository.findById(id);
+    public Student idList(Integer id) {
+        return studentRepository.getId(id);
     }
 
     /**

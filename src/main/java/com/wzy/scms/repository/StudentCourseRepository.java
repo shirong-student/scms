@@ -8,8 +8,10 @@ import com.wzy.scms.vo.SelectedCourseVo;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -20,6 +22,11 @@ public interface StudentCourseRepository extends JpaRepository<StudentCourse, In
             " where (select student.id from student where student.code = ?1) = sc.student_id and " +
             " (select course.id from course where course.code = ?2) = sc.course_id", nativeQuery = true)
     StudentCourse selectStudentCourse(String studentCode, String courseCode);
+
+    @Transactional
+    @Modifying
+    @Query(value = "delete from student_course where student_id=?1", nativeQuery = true)
+    int deleteStudentId(Integer studentId);
 
     //实现根据学号查询学生所选课程的接口（查询出的数据需要包含学号，姓名，课程编号，课程名，成绩），按成绩升序排序输出。
     @Query("select distinct new com.wzy.scms.vo.SelectedCourseVo(s.code, s.name, c.code, c.name, sc.achievement) " +
@@ -47,7 +54,8 @@ public interface StudentCourseRepository extends JpaRepository<StudentCourse, In
      * c.id
      */
     @Query("select new com.wzy.scms.vo.AvgVo(c.name,AVG(sc.achievement)) from StudentCourse sc ,Course c " +
-            " where sc.courseId in (SELECT sc.courseId FROM StudentCourse sc WHERE sc.studentId = ( SELECT s.id FROM Student s WHERE s.code = ?1 )) GROUP BY sc.courseId")
+            " where sc.courseId in (SELECT sc.courseId FROM StudentCourse sc WHERE sc.studentId = " +
+            " ( SELECT s.id FROM Student s WHERE s.code = ?1 )) GROUP BY sc.courseId")
     List<AvgVo> selectAvgAchievement(String code);
 
     /**
@@ -71,9 +79,10 @@ public interface StudentCourseRepository extends JpaRepository<StudentCourse, In
      * AND c.id = sc.course_id
      * AND s.id = sc.student_id
      */
-    @Query("select new com.wzy.scms.vo.ElectiveCourseVo(c.code,c.name,s.code,s.name,s.sex,s.department,sc.selectDate,sc.achievement) from Student s, Course c, StudentCourse sc " +
+    @Query("select new com.wzy.scms.vo.ElectiveCourseVo(c.code,c.name,s.code,s.name,s.sex,s.department,sc.selectDate,sc.achievement) " +
+            " from Student s, Course c, StudentCourse sc " +
             " where c.id=sc.courseId and s.id=sc.studentId and  c.name=?1")
-    List<ElectiveCourseVo> selectCourseStudent(String name);
+    Page<ElectiveCourseVo> selectCourseStudent(String name, Pageable pageable);
 
     /**
      * 实现根据课程名称，统计查询课程的最高分、最低分、平均分的接口
