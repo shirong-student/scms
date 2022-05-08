@@ -36,7 +36,7 @@ public class CourseController {
      */
     @GetMapping("/delete")
     public String delete(Integer id) {
-        if (courseRepository.getCourseId().size() > 0) {
+        if (courseRepository.getCourseId(id).size() > 0) {
             return "Delete Failed";
         }
         courseRepository.deleteById(id);
