@@ -1,6 +1,5 @@
 package com.wzy.scms.controller;
 
-import com.wzy.scms.entity.StudentCourse;
 import com.wzy.scms.entity.Teacher;
 import com.wzy.scms.repository.TeacherRepository;
 import com.wzy.scms.vo.MinMaxAvgAchievementVo;
